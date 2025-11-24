@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class Partido implements Serializable {
     
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L; // Incrementamos versión por el nuevo campo
 
     // Atributos de la clase
     private int id;
@@ -18,36 +18,36 @@ public class Partido implements Serializable {
     private Equipo equipoVisitante;
     private String resultado;
     private LocalDateTime fechaHora;
+    private int duracionMinutos; // <-- NUEVO ATRIBUTO CRUCIAL
     private Cancha cancha;
     private Arbitro arbitro;
     private boolean finalizado;
-    private Torneo torneoPerteneciente; // <-- NUEVO ATRIBUTO
+    private Torneo torneoPerteneciente;
 
     /**
-     * Constructor modificado para incluir el torneo (puede ser null).
+     * Constructor completo para partidos de torneo.
      */
-    public Partido(Equipo equipoLocal, Equipo equipoVisitante, LocalDateTime fechaHora, Cancha cancha, Arbitro arbitro, Torneo torneoPerteneciente) {
+    public Partido(Equipo equipoLocal, Equipo equipoVisitante, LocalDateTime fechaHora, int duracionMinutos, Cancha cancha, Arbitro arbitro, Torneo torneoPerteneciente) {
         this.id = -1; 
         this.equipoLocal = equipoLocal;
         this.equipoVisitante = equipoVisitante;
         this.fechaHora = fechaHora;
+        this.duracionMinutos = duracionMinutos; // <-- Asignación
         this.cancha = cancha;
         this.arbitro = arbitro;
         this.resultado = "Pendiente";
         this.finalizado = false;
-        this.torneoPerteneciente = torneoPerteneciente; // <-- ASIGNACIÓN
+        this.torneoPerteneciente = torneoPerteneciente;
     }
     
-    // Sobrecarga del constructor existente para partidos sueltos (torneoPerteneciente = null)
-    public Partido(Equipo equipoLocal, Equipo equipoVisitante, LocalDateTime fechaHora, Cancha cancha, Arbitro arbitro) {
-        this(equipoLocal, equipoVisitante, fechaHora, cancha, arbitro, null);
+    /**
+     * Constructor para partidos sueltos (sin torneo).
+     */
+    public Partido(Equipo equipoLocal, Equipo equipoVisitante, LocalDateTime fechaHora, int duracionMinutos, Cancha cancha, Arbitro arbitro) {
+        this(equipoLocal, equipoVisitante, fechaHora, duracionMinutos, cancha, arbitro, null);
     }
 
 
-    /**
-     * Devuelve una descripción simple del enfrentamiento.
-     * @return Una cadena con el formato "NombreEquipoLocal vs NombreEquipoVisitante".
-     */
     public String getDescripcion() {
         String base = equipoLocal.getNombre() + " vs " + equipoVisitante.getNombre();
         if (torneoPerteneciente != null) {
@@ -58,83 +58,43 @@ public class Partido implements Serializable {
 
     // --- Getters y Setters ---
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public Equipo getEquipoLocal() { return equipoLocal; }
+    public void setEquipoLocal(Equipo equipoLocal) { this.equipoLocal = equipoLocal; }
 
-    public Equipo getEquipoLocal() {
-        return equipoLocal;
-    }
+    public Equipo getEquipoVisitante() { return equipoVisitante; }
+    public void setEquipoVisitante(Equipo equipoVisitante) { this.equipoVisitante = equipoVisitante; }
 
-    public void setEquipoLocal(Equipo equipoLocal) {
-        this.equipoLocal = equipoLocal;
-    }
+    public String getResultado() { return resultado; }
+    public void setResultado(String resultado) { this.resultado = resultado; }
 
-    public Equipo getEquipoVisitante() {
-        return equipoVisitante;
-    }
+    public LocalDateTime getFechaHora() { return fechaHora; }
+    public void setFechaHora(LocalDateTime fechaHora) { this.fechaHora = fechaHora; }
 
-    public void setEquipoVisitante(Equipo equipoVisitante) {
-        this.equipoVisitante = equipoVisitante;
-    }
+    // NUEVOS GETTER Y SETTER PARA DURACIÓN
+    public int getDuracionMinutos() { return duracionMinutos; }
+    public void setDuracionMinutos(int duracionMinutos) { this.duracionMinutos = duracionMinutos; }
 
-    public String getResultado() {
-        return resultado;
-    }
+    public Cancha getCancha() { return cancha; }
+    public void setCancha(Cancha cancha) { this.cancha = cancha; }
 
-    public void setResultado(String resultado) {
-        this.resultado = resultado;
-    }
+    public Arbitro getArbitro() { return arbitro; }
+    public void setArbitro(Arbitro arbitro) { this.arbitro = arbitro; }
 
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
-    }
-
-    public void setFechaHora(LocalDateTime fechaHora) {
-        this.fechaHora = fechaHora;
-    }
-
-    public Cancha getCancha() {
-        return cancha;
-    }
-
-    public void setCancha(Cancha cancha) {
-        this.cancha = cancha;
-    }
-
-    public Arbitro getArbitro() {
-        return arbitro;
-    }
-
-    public void setArbitro(Arbitro arbitro) {
-        this.arbitro = arbitro;
-    }
-
-    public boolean isFinalizado() {
-        return finalizado;
-    }
-
-    public void setFinalizado(boolean finalizado) {
-        this.finalizado = finalizado;
-    }
+    public boolean isFinalizado() { return finalizado; }
+    public void setFinalizado(boolean finalizado) { this.finalizado = finalizado; }
     
-    public Torneo getTorneoPerteneciente() { // <-- NUEVO GETTER
-        return torneoPerteneciente;
-    }
-
-    public void setTorneoPerteneciente(Torneo torneoPerteneciente) { // <-- NUEVO SETTER
-        this.torneoPerteneciente = torneoPerteneciente;
-    }
+    public Torneo getTorneoPerteneciente() { return torneoPerteneciente; }
+    public void setTorneoPerteneciente(Torneo torneoPerteneciente) { this.torneoPerteneciente = torneoPerteneciente; }
 
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         return getDescripcion() + 
                " | Fecha: " + fechaHora.format(formatter) +
+               " (" + duracionMinutos + " min)" +
                " | Resultado: [" + resultado + "]";
     }
 }

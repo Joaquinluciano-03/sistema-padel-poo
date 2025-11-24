@@ -1,38 +1,25 @@
 package controlador;
 
-import excepciones.EquipoYaExisteException;
-import excepciones.InscripcionException;
-import excepciones.JugadorYaExisteException;
+import excepciones.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import modelo.Arbitro;
-import modelo.Cancha;
-import modelo.Equipo;
-import modelo.Jugador;
-import modelo.Partido;
-import modelo.Sede;
-import modelo.Torneo;
+import modelo.*;
 import persistencia.IPersistencia;
-import servicios.ArbitroServicio;
-import servicios.CompeticionServicio;
-import servicios.EquipoServicio;
-import servicios.IArbitroServicio;
-import servicios.ICompeticionServicio;
-import servicios.IEquipoServicio;
-import servicios.IJugadorServicio;
-import servicios.JugadorServicio;
+import servicios.*;
 
 public class GestorSistema {
     
     private IPersistencia persistencia; 
     
+    // Interfaces de servicio
     private IJugadorServicio jugadorServicio; 
     private IArbitroServicio arbitroServicio; 
     private IEquipoServicio equipoServicio; 
     private ICompeticionServicio competicionServicio; 
 
     public GestorSistema() {
+        // Inicialización de implementaciones
         this.jugadorServicio = new JugadorServicio();
         this.arbitroServicio = new ArbitroServicio();
         this.equipoServicio = new EquipoServicio();
@@ -51,19 +38,18 @@ public class GestorSistema {
     
     // --- MÉTODOS DE REGISTRO ---
     
-    // Ahora lanza excepción si hay duplicado
     public void agregarSede(Sede sede) throws IllegalArgumentException {
         competicionServicio.agregarSede(sede);
         guardar();
     }
 
-    // ... (Resto de métodos de registro igual) ...
     public void registrarTorneo(Torneo torneo) {
         competicionServicio.registrarTorneo(torneo);
         guardar();
     }
     
     public void registrarJugador(Jugador jugador) throws JugadorYaExisteException {
+        // Validación cruzada: DNI no debe ser de árbitro
         if (arbitroServicio.buscarPorDni(jugador.getDni()) != null) {
              throw new JugadorYaExisteException("El DNI ya está registrado como árbitro.", jugador.getDni());
         }
@@ -72,6 +58,7 @@ public class GestorSistema {
     }
     
     public void registrarArbitro(Arbitro arbitro) throws JugadorYaExisteException {
+        // Validación cruzada: DNI no debe ser de jugador
         if (jugadorServicio.buscarPorDni(arbitro.getDni()) != null) {
              throw new JugadorYaExisteException("El DNI ya está registrado como jugador.", arbitro.getDni());
         }
@@ -94,6 +81,7 @@ public class GestorSistema {
         guardar();
     }
     
+    // --- MÉTODOS DE PERSISTENCIA (Partidos Sueltos) ---
     public List<Partido> getPartidosSuetos() {
         return competicionServicio.getPartidosSuetos();
     }
@@ -102,12 +90,12 @@ public class GestorSistema {
         competicionServicio.setPartidosSuetos(partidos);
     }
     
+    // --- VALIDACIÓN ---
     public boolean validarDisponibilidadCancha(Cancha cancha, LocalDateTime inicio, int duracionMinutos) {
         return competicionServicio.validarDisponibilidadCancha(cancha, inicio, duracionMinutos);
     }
 
-    // --- MÉTODOS DE MODIFICACIÓN ---
-
+    // --- MODIFICACIÓN ---
     public boolean modificarJugador(String dni, String nuevoNombre, String nuevoApellido, String nuevaPosicion, int nuevoNivel) {
         boolean exito = jugadorServicio.modificar(dni, nuevoNombre, nuevoApellido, nuevaPosicion, nuevoNivel);
         if (exito) guardar();
@@ -115,14 +103,18 @@ public class GestorSistema {
     }
     
     public boolean modificarArbitro(String dni, String nuevoNombre, String nuevoApellido, String nuevaLicencia) {
-        boolean exito = arbitroServicio.modificar(dni, nuevoNombre, nuevoApellido, nuevaLicencia); 
+        boolean exito = arbitroServicio.modificar(dni, nuevoNombre, nuevoApellido, nuevaLicencia);
         if (exito) guardar();
         return exito;
     }
 
     public void editarEquipo(String nombreActual, String nuevoNombre, List<Jugador> nuevosJugadores) throws EquipoYaExisteException {
-        equipoServicio.editar(nombreActual, nuevoNombre, nuevosJugadores);
-        guardar();
+        try {
+            equipoServicio.editar(nombreActual, nuevoNombre, nuevosJugadores);
+            guardar();
+        } catch (IllegalArgumentException e) {
+            throw e; 
+        }
     }
 
     public boolean modificarSede(String nombreActual, String nuevoNombre, String nuevaDireccion) {
@@ -137,12 +129,14 @@ public class GestorSistema {
         return exito;
     }
     
-    // ... (Métodos finalizarPartido y finalizarTorneo igual) ...
+    // --- FINALIZACIÓN ---
     public void finalizarPartido(Partido partido, String resultado, Equipo ganador) {
         if (partido == null || partido.isFinalizado()) return;
         
         partido.setResultado(resultado);
         partido.setFinalizado(true);
+        
+        // Actualizar estadísticas
         Equipo perdedor = (ganador.equals(partido.getEquipoLocal())) ? partido.getEquipoVisitante() : partido.getEquipoLocal();
         ganador.incrementarPartidosGanados();
         ganador.getJugadores().forEach(Jugador::incrementarPartidosGanados);
@@ -158,13 +152,18 @@ public class GestorSistema {
         torneo.finalizarTorneo(ganador);
         ganador.incrementarTorneosGanados();
         ganador.getJugadores().forEach(Jugador::incrementarTorneosGanados);
-        
         guardar();
     }
-
-    // --- MÉTODOS DE ELIMINACIÓN ---
     
+    // --- ELIMINACIÓN ---
     public boolean eliminarJugador(String dni) {
+        // Primero eliminar de equipos para integridad
+        Jugador j = jugadorServicio.buscarPorDni(dni);
+        if (j != null) {
+             for (Equipo e : equipoServicio.getTodos()) {
+                 e.getJugadores().remove(j);
+             }
+        }
         boolean eliminado = jugadorServicio.eliminar(dni);
         if (eliminado) guardar();
         return eliminado;
@@ -177,9 +176,10 @@ public class GestorSistema {
     }
 
     public boolean eliminarEquipo(String nombre) {
-        Equipo equipo = buscarEquipoPorNombre(nombre);
+        Equipo equipo = equipoServicio.buscarPorNombre(nombre);
         if (equipo == null) return false;
 
+        // Eliminar de torneos y partidos pendientes
         for (Torneo torneo : competicionServicio.getTodosLosTorneos()) {
             torneo.getEquiposInscritos().remove(equipo);
             torneo.getPartidos().removeIf(p -> !p.isFinalizado() && (p.getEquipoLocal().equals(equipo) || p.getEquipoVisitante().equals(equipo)));
@@ -202,7 +202,6 @@ public class GestorSistema {
         return eliminado;
     }
     
-    // --- NUEVOS MÉTODOS DE ELIMINACIÓN SEDES/CANCHAS ---
     public boolean eliminarSede(String nombre) {
         boolean eliminado = competicionServicio.eliminarSede(nombre);
         if (eliminado) guardar();
@@ -214,13 +213,15 @@ public class GestorSistema {
         if (eliminado) guardar();
         return eliminado;
     }
-    // --------------------------------------------------
     
+    // --- GETTERS DELEGADOS ---
     public List<Sede> getSedes() { return competicionServicio.getSedes(); }
     public List<Jugador> getJugadoresRegistrados() { return jugadorServicio.getTodos(); }
-    public List<Arbitro> getArbitrosRegistrados() { return arbitroServicio.getTodos(); }
     
+    // FIX: Ahora usamos el servicio correcto
+    public List<Arbitro> getArbitrosRegistrados() { return arbitroServicio.getTodos(); } 
     public Arbitro buscarArbitroPorDni(String dni) { return arbitroServicio.buscarPorDni(dni); }
+    
     public List<Equipo> getEquiposRegistrados() { return equipoServicio.getTodos(); }
     public List<Partido> getPartidosPendientes() { return competicionServicio.getPartidosPendientes(); }
     public List<Torneo> getTodosLosTorneos() { return competicionServicio.getTodosLosTorneos(); }

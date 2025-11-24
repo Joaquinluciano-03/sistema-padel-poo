@@ -14,12 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.text.DateFormatter;
-import modelo.Arbitro;
-import modelo.Cancha;
-import modelo.Equipo;
-import modelo.Partido;
-import modelo.Sede;
-import modelo.Torneo;
+import modelo.*;
 import util.Estilo;
 
 public class PanelGestionCompeticiones extends JPanel {
@@ -337,7 +332,8 @@ public class PanelGestionCompeticiones extends JPanel {
                 }
                 
                 // 5. Creación y registro
-                Partido partido = new Partido(local, visitante, fechaHoraInicio, cancha, arbitro, torneo);
+                // CORREGIDO: Pasamos la duración al constructor
+                Partido partido = new Partido(local, visitante, fechaHoraInicio, duracionMinutos, cancha, arbitro, torneo);
                 gestor.registrarPartidoSuelto(partido);
                 actualizar();
                 JOptionPane.showMessageDialog(this, "Partido creado y programado.");
