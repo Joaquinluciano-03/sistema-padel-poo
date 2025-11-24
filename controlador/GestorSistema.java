@@ -23,11 +23,6 @@ import servicios.IEquipoServicio;
 import servicios.IJugadorServicio;
 import servicios.JugadorServicio;
 
-/**
- * Actúa como una fachada (Facade) para la lógica de negocio del sistema.
- * Depende de todas las interfaces de servicio (IJugadorServicio, IArbitroServicio, etc.)
- * para cumplir con el Principio de Inversión de Dependencias (DIP).
- */
 public class GestorSistema {
     
     private IPersistencia persistencia; 
@@ -35,7 +30,7 @@ public class GestorSistema {
     private IJugadorServicio jugadorServicio; 
     private IArbitroServicio arbitroServicio; 
     private IEquipoServicio equipoServicio; 
-    private ICompeticionServicio competicionServicio; // <-- Variable correcta
+    private ICompeticionServicio competicionServicio; 
 
     public GestorSistema() {
         this.jugadorServicio = new JugadorServicio();
@@ -54,20 +49,21 @@ public class GestorSistema {
         }
     }
     
-    // --- MÉTODOS DE REGISTRO / AGREGAR ---
+    // --- MÉTODOS DE REGISTRO ---
     
-    public void agregarSede(Sede sede) {
+    // Ahora lanza excepción si hay duplicado
+    public void agregarSede(Sede sede) throws IllegalArgumentException {
         competicionServicio.agregarSede(sede);
         guardar();
     }
 
+    // ... (Resto de métodos de registro igual) ...
     public void registrarTorneo(Torneo torneo) {
         competicionServicio.registrarTorneo(torneo);
         guardar();
     }
     
     public void registrarJugador(Jugador jugador) throws JugadorYaExisteException {
-        // Validación cruzada para DNI único:
         if (arbitroServicio.buscarPorDni(jugador.getDni()) != null) {
              throw new JugadorYaExisteException("El DNI ya está registrado como árbitro.", jugador.getDni());
         }
@@ -76,7 +72,6 @@ public class GestorSistema {
     }
     
     public void registrarArbitro(Arbitro arbitro) throws JugadorYaExisteException {
-        // Validación cruzada para DNI único:
         if (jugadorServicio.buscarPorDni(arbitro.getDni()) != null) {
              throw new JugadorYaExisteException("El DNI ya está registrado como jugador.", arbitro.getDni());
         }
@@ -99,8 +94,6 @@ public class GestorSistema {
         guardar();
     }
     
-    // --- MÉTODOS DE PERSISTENCIA ---
-
     public List<Partido> getPartidosSuetos() {
         return competicionServicio.getPartidosSuetos();
     }
@@ -109,8 +102,6 @@ public class GestorSistema {
         competicionServicio.setPartidosSuetos(partidos);
     }
     
-    // --- MÉTODOS DE VALIDACIÓN ---
-
     public boolean validarDisponibilidadCancha(Cancha cancha, LocalDateTime inicio, int duracionMinutos) {
         return competicionServicio.validarDisponibilidadCancha(cancha, inicio, duracionMinutos);
     }
@@ -141,14 +132,12 @@ public class GestorSistema {
     }
 
     public boolean modificarCancha(String nombreSede, int numeroCancha, String nuevaSuperficie, boolean nuevaIluminacion) {
-        // FIX: Corregido el nombre de la variable de 'competicionServicion' a 'competicionServicio'
         boolean exito = competicionServicio.modificarCancha(nombreSede, numeroCancha, nuevaSuperficie, nuevaIluminacion); 
         if (exito) guardar();
         return exito;
     }
     
-    // --- MÉTODOS DE LÓGICA DE NEGOCIO ---
-
+    // ... (Métodos finalizarPartido y finalizarTorneo igual) ...
     public void finalizarPartido(Partido partido, String resultado, Equipo ganador) {
         if (partido == null || partido.isFinalizado()) return;
         
@@ -172,7 +161,7 @@ public class GestorSistema {
         
         guardar();
     }
-    
+
     // --- MÉTODOS DE ELIMINACIÓN ---
     
     public boolean eliminarJugador(String dni) {
@@ -213,7 +202,19 @@ public class GestorSistema {
         return eliminado;
     }
     
-    // --- GETTERS Y MÉTODOS DE BÚSQUEDA ---
+    // --- NUEVOS MÉTODOS DE ELIMINACIÓN SEDES/CANCHAS ---
+    public boolean eliminarSede(String nombre) {
+        boolean eliminado = competicionServicio.eliminarSede(nombre);
+        if (eliminado) guardar();
+        return eliminado;
+    }
+
+    public boolean eliminarCancha(Sede sede, int numeroCancha) {
+        boolean eliminado = competicionServicio.eliminarCancha(sede, numeroCancha);
+        if (eliminado) guardar();
+        return eliminado;
+    }
+    // --------------------------------------------------
     
     public List<Sede> getSedes() { return competicionServicio.getSedes(); }
     public List<Jugador> getJugadoresRegistrados() { return jugadorServicio.getTodos(); }

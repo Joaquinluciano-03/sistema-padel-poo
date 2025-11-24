@@ -11,14 +11,10 @@ import modelo.Sede;
 import modelo.Torneo;
 import util.ValidadorHorario;
 
-/**
- * Clase de servicio responsable de la gestión de competiciones (Torneos, Partidos, Sedes).
- * Implementa ICompeticionServicio para cumplir el DIP y utiliza ValidadorHorario para cumplir SRP.
- */
 public class CompeticionServicio implements ICompeticionServicio {
     
     private List<Sede> sedes = new ArrayList<>();
-    private List<Partido> partidosSuetos = new ArrayList<>(); // <-- ESTA LISTA DEBE SER PERSISTIDA
+    private List<Partido> partidosSuetos = new ArrayList<>();
     private List<Torneo> torneosRegistrados = new ArrayList<>();
     
     private final ValidadorHorario validadorHorario;
@@ -28,10 +24,28 @@ public class CompeticionServicio implements ICompeticionServicio {
     }
 
     @Override
-    public void agregarSede(Sede sede) {
+    public void agregarSede(Sede sede) throws IllegalArgumentException {
+        // VALIDACIÓN DE DUPLICADOS
+        if (buscarSedePorNombre(sede.getNombre()) != null) {
+            throw new IllegalArgumentException("Ya existe una sede con el nombre: " + sede.getNombre());
+        }
         sedes.add(sede);
     }
     
+    // --- NUEVOS MÉTODOS DE ELIMINACIÓN ---
+    
+    @Override
+    public boolean eliminarSede(String nombre) {
+        return sedes.removeIf(s -> s.getNombre().equalsIgnoreCase(nombre));
+    }
+
+    @Override
+    public boolean eliminarCancha(Sede sede, int numeroCancha) {
+        if (sede == null) return false;
+        return sede.getCanchas().removeIf(c -> c.getNumero() == numeroCancha);
+    }
+    // -------------------------------------
+
     @Override
     public void registrarTorneo(Torneo torneo) {
         torneosRegistrados.add(torneo);
@@ -124,6 +138,12 @@ public class CompeticionServicio implements ICompeticionServicio {
     public boolean modificarSede(String nombreActual, String nuevoNombre, String nuevaDireccion) {
         Sede sede = buscarSedePorNombre(nombreActual);
         if (sede == null) return false;
+        
+        // Validar que el nuevo nombre no exista (si es diferente al actual)
+        if (!nombreActual.equalsIgnoreCase(nuevoNombre) && buscarSedePorNombre(nuevoNombre) != null) {
+            return false; // O lanzar excepción
+        }
+
         sede.setNombre(nuevoNombre);
         sede.setDireccion(nuevaDireccion);
         return true;
@@ -140,7 +160,6 @@ public class CompeticionServicio implements ICompeticionServicio {
         return true;
     }
     
-    // --- MÉTODOS DE PERSISTENCIA ---
     @Override
     public List<Partido> getPartidosSuetos() {
         return partidosSuetos;
@@ -148,7 +167,6 @@ public class CompeticionServicio implements ICompeticionServicio {
 
     @Override
     public void setPartidosSuetos(List<Partido> partidos) {
-        // Limpiar la lista existente y añadir todos los elementos cargados
         this.partidosSuetos.clear();
         this.partidosSuetos.addAll(partidos);
     }

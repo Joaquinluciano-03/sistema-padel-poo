@@ -33,12 +33,21 @@ public class PanelGestionSedes extends JPanel {
         scrollPane.setBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL, 1));
         this.add(scrollPane, BorderLayout.CENTER);
 
-        // --- PANEL DE BOTONES ---
-        JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
-        Estilo.decorarPanel(botonesPanel);
+        // --- PANEL DE ACCIONES (GRID) ---
+        // Usamos un panel contenedor para los botones de acción y el de volver
+        JPanel surContainer = new JPanel(new BorderLayout(10, 10));
+        Estilo.decorarPanel(surContainer);
+
+        // Panel para los botones de gestión (Sedes y Canchas)
+        JPanel accionesPanel = new JPanel(new GridLayout(2, 1, 5, 5)); // 2 filas para separar Sedes de Canchas
+        Estilo.decorarPanel(accionesPanel);
         
-        // BOTONES DE ACCIÓN
-        JButton btnCrearSede = new JButton("Crear Nueva Sede");
+        // Fila 1: Gestión de Sedes
+        JPanel filaSedes = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        Estilo.decorarPanel(filaSedes);
+        filaSedes.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), "Sedes"));
+        
+        JButton btnCrearSede = new JButton("Crear Sede");
         Estilo.decorarBoton(btnCrearSede);
         btnCrearSede.addActionListener(e -> crearSede());
         
@@ -46,7 +55,21 @@ public class PanelGestionSedes extends JPanel {
         Estilo.decorarBoton(btnModSede);
         btnModSede.addActionListener(e -> modificarSede());
         
-        JButton btnAddCancha = new JButton("Agregar Cancha a Sede");
+        JButton btnElimSede = new JButton("Eliminar Sede");
+        Estilo.decorarBoton(btnElimSede);
+        btnElimSede.setBackground(Estilo.COLOR_OCUPADO); // Rojo
+        btnElimSede.addActionListener(e -> eliminarSede());
+        
+        filaSedes.add(btnCrearSede);
+        filaSedes.add(btnModSede);
+        filaSedes.add(btnElimSede); // ¡Agregado!
+        
+        // Fila 2: Gestión de Canchas
+        JPanel filaCanchas = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        Estilo.decorarPanel(filaCanchas);
+        filaCanchas.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), "Canchas"));
+        
+        JButton btnAddCancha = new JButton("Agregar Cancha");
         Estilo.decorarBoton(btnAddCancha);
         btnAddCancha.addActionListener(e -> agregarCanchaASede());
 
@@ -54,19 +77,33 @@ public class PanelGestionSedes extends JPanel {
         Estilo.decorarBoton(btnModCancha);
         btnModCancha.addActionListener(e -> modificarCancha());
         
-        // BOTÓN VOLVER
-        JButton btnVolver = new JButton("Volver al Menú Principal");
+        JButton btnElimCancha = new JButton("Eliminar Cancha");
+        Estilo.decorarBoton(btnElimCancha);
+        btnElimCancha.setBackground(Estilo.COLOR_OCUPADO); // Rojo
+        btnElimCancha.addActionListener(e -> eliminarCancha());
+        
+        filaCanchas.add(btnAddCancha);
+        filaCanchas.add(btnModCancha);
+        filaCanchas.add(btnElimCancha); // ¡Agregado!
+
+        accionesPanel.add(filaSedes);
+        accionesPanel.add(filaCanchas);
+        
+        surContainer.add(accionesPanel, BorderLayout.CENTER);
+
+        // --- BOTÓN VOLVER (SEPARADO AL FONDO) ---
+        JPanel volverPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        Estilo.decorarPanel(volverPanel);
+        
+        JButton btnVolver = new JButton("Volver al Menú");
         Estilo.decorarBoton(btnVolver);
         btnVolver.setBackground(Estilo.COLOR_TEXTO);
         btnVolver.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
         
-        botonesPanel.add(btnCrearSede);
-        botonesPanel.add(btnModSede);
-        botonesPanel.add(btnAddCancha);
-        botonesPanel.add(btnModCancha);
-        botonesPanel.add(btnVolver);
+        volverPanel.add(btnVolver);
+        surContainer.add(volverPanel, BorderLayout.SOUTH);
         
-        this.add(botonesPanel, BorderLayout.SOUTH);
+        this.add(surContainer, BorderLayout.SOUTH);
     }
 
     public void actualizar() {
@@ -93,8 +130,18 @@ public class PanelGestionSedes extends JPanel {
         form.add(new JLabel("Dirección:")); form.add(direccionField);
         int result = JOptionPane.showConfirmDialog(this, form, "Crear Sede", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            gestor.agregarSede(new Sede(nombreField.getText(), direccionField.getText()));
-            actualizar();
+            try {
+                String nombre = nombreField.getText().trim();
+                if (nombre.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                gestor.agregarSede(new Sede(nombre, direccionField.getText()));
+                actualizar();
+                JOptionPane.showMessageDialog(this, "Sede creada exitosamente.");
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error: Duplicado", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -116,9 +163,37 @@ public class PanelGestionSedes extends JPanel {
 
         int result = JOptionPane.showConfirmDialog(this, form, "Modificar Sede", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            gestor.modificarSede(nombreActual, nombreField.getText(), direccionField.getText());
-            actualizar();
-            JOptionPane.showMessageDialog(this, "Sede actualizada.");
+            boolean exito = gestor.modificarSede(nombreActual, nombreField.getText(), direccionField.getText());
+            if (exito) {
+                actualizar();
+                JOptionPane.showMessageDialog(this, "Sede actualizada.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al actualizar (posible nombre duplicado).", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void eliminarSede() {
+        String nombre = JOptionPane.showInputDialog(this, "Ingrese el nombre de la sede a eliminar:");
+        if (nombre == null || nombre.trim().isEmpty()) return;
+        
+        Sede sede = gestor.buscarSedePorNombre(nombre);
+        if (sede == null) {
+            JOptionPane.showMessageDialog(this, "Sede no encontrada.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "¿Está seguro de eliminar la sede '" + nombre + "'?\nSe perderán todas sus canchas.", 
+            "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+            
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (gestor.eliminarSede(nombre)) {
+                JOptionPane.showMessageDialog(this, "Sede eliminada.");
+                actualizar();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo eliminar la sede.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -143,9 +218,16 @@ public class PanelGestionSedes extends JPanel {
             try {
                 Sede sede = gestor.buscarSedePorNombre((String)sedeCombo.getSelectedItem());
                 int numero = Integer.parseInt(numeroField.getText());
+                
+                // Validación simple de número de cancha único en la sede
+                if (sede.getCanchas().stream().anyMatch(c -> c.getNumero() == numero)) {
+                    JOptionPane.showMessageDialog(this, "Ya existe la cancha N°" + numero + " en esta sede.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
                 Cancha cancha = new Cancha(numero, superficieField.getText(), iluminacionCheck.isSelected());
                 sede.agregarCancha(cancha);
-                gestor.agregarSede(sede);
+                gestor.agregarSede(sede); // Guarda cambios
                 actualizar();
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "El número de cancha debe ser un valor numérico.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -200,6 +282,45 @@ public class PanelGestionSedes extends JPanel {
             gestor.modificarCancha(sede.getNombre(), numCancha, superficieField.getText(), iluminacionCheck.isSelected());
             actualizar();
             JOptionPane.showMessageDialog(this, "Cancha modificada correctamente.");
+        }
+    }
+    
+    private void eliminarCancha() {
+        if (gestor.getSedes().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay sedes creadas.");
+            return;
+        }
+
+        // 1. Seleccionar Sede
+        JComboBox<String> sedeCombo = new JComboBox<>();
+        gestor.getSedes().forEach(s -> sedeCombo.addItem(s.getNombre()));
+        
+        int resultSede = JOptionPane.showConfirmDialog(this, sedeCombo, "Seleccionar Sede", JOptionPane.OK_CANCEL_OPTION);
+        if (resultSede != JOptionPane.OK_OPTION) return;
+
+        Sede sede = gestor.buscarSedePorNombre((String)sedeCombo.getSelectedItem());
+        if (sede.getCanchas().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Esta sede no tiene canchas.");
+            return;
+        }
+
+        // 2. Seleccionar Cancha
+        JComboBox<Integer> canchaCombo = new JComboBox<>();
+        sede.getCanchas().forEach(c -> canchaCombo.addItem(c.getNumero()));
+        
+        int resultCancha = JOptionPane.showConfirmDialog(this, canchaCombo, "Seleccionar N° Cancha a Eliminar", JOptionPane.OK_CANCEL_OPTION);
+        if (resultCancha != JOptionPane.OK_OPTION) return;
+
+        int numCancha = (Integer) canchaCombo.getSelectedItem();
+        
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Seguro que desea eliminar la cancha N°" + numCancha + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (gestor.eliminarCancha(sede, numCancha)) {
+                JOptionPane.showMessageDialog(this, "Cancha eliminada.");
+                actualizar();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar la cancha.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

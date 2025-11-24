@@ -8,19 +8,18 @@ import modelo.Partido;
 import modelo.Sede;
 import modelo.Torneo;
 
-/**
- * Interfaz que define el contrato para los servicios de gestión de competiciones,
- * incluyendo torneos, partidos, sedes y la validación de disponibilidad de cancha.
- * Cumple con el Principio de Inversión de Dependencias (DIP).
- */
 public interface ICompeticionServicio {
     
     // Gestión de Sedes
-    void agregarSede(Sede sede);
+    void agregarSede(Sede sede) throws IllegalArgumentException; // Ahora lanza excepción
     Sede buscarSedePorNombre(String nombre);
     List<Sede> getSedes();
     boolean modificarSede(String nombreActual, String nuevoNombre, String nuevaDireccion);
+    boolean eliminarSede(String nombre); // NUEVO
+    
+    // Gestión de Canchas
     boolean modificarCancha(String nombreSede, int numeroCancha, String nuevaSuperficie, boolean nuevaIluminacion);
+    boolean eliminarCancha(Sede sede, int numeroCancha); // NUEVO
 
     // Gestión de Torneos y Partidos
     void registrarTorneo(Torneo torneo);
@@ -32,16 +31,10 @@ public interface ICompeticionServicio {
     boolean eliminarTorneo(Torneo torneo);
     boolean eliminarPartido(Partido partido);
 
-    // Validación de Horarios (Método crucial)
     List<Partido> getPartidosPorSedeYFecha(String nombreSede, LocalDate fecha);
     
-    /**
-     * Verifica si una cancha está disponible en un rango de tiempo específico.
-     * Esta funcionalidad será implementada por el Validador Horario.
-     */
     boolean validarDisponibilidadCancha(Cancha cancha, LocalDateTime inicio, int duracionMinutos);
 
-    // --- NUEVOS CONTRATOS PARA PERSISTENCIA ---
     List<Partido> getPartidosSuetos();
     void setPartidosSuetos(List<Partido> partidos);
 }
