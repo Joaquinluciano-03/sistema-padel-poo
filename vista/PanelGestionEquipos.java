@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import modelo.Equipo;
 import modelo.Jugador;
 import util.Estilo;
@@ -13,7 +14,8 @@ import util.Estilo;
 public class PanelGestionEquipos extends JPanel {
 
     private GestorSistema gestor;
-    private JTextArea equiposTextArea;
+    private JTable tablaEquipos;
+    private DefaultTableModel tableModel;
 
     public PanelGestionEquipos(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
@@ -26,34 +28,48 @@ public class PanelGestionEquipos extends JPanel {
         // Título del Panel
         this.add(Estilo.crearTitulo("Gestión de Equipos"), BorderLayout.NORTH);
 
-        // --- ÁREA DE TEXTO DE EQUIPOS ---
-        equiposTextArea = new JTextArea(15, 50);
-        equiposTextArea.setEditable(false);
-        equiposTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        equiposTextArea.setBackground(Estilo.BLANCO); 
-        equiposTextArea.setForeground(Estilo.COLOR_TEXTO); 
+        // --- TABLA DE EQUIPOS ---
+        String[] columnas = {"Nombre Equipo", "Jugador 1", "Jugador 2", "Partidos (G/P)", "Torneos G."};
+        tableModel = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // La tabla no es editable directamente
+            }
+        };
         
-        JScrollPane scrollPane = new JScrollPane(equiposTextArea);
+        tablaEquipos = new JTable(tableModel);
+        Estilo.decorarTabla(tablaEquipos);
+        
+        // Ajustar ancho de columnas para mejor visualización
+        tablaEquipos.getColumnModel().getColumn(0).setPreferredWidth(150); // Nombre equipo
+        tablaEquipos.getColumnModel().getColumn(1).setPreferredWidth(150); // Jugador 1
+        tablaEquipos.getColumnModel().getColumn(2).setPreferredWidth(150); // Jugador 2
+        
+        JScrollPane scrollPane = new JScrollPane(tablaEquipos);
+        scrollPane.getViewport().setBackground(Estilo.BLANCO);
         scrollPane.setBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL, 1));
+        
         this.add(scrollPane, BorderLayout.CENTER);
 
         // --- PANEL DE BOTONES ---
         JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         Estilo.decorarPanel(botonesPanel);
 
-        // BOTÓN CREAR
-        JButton btnCrear = new JButton("Crear Equipo con 2 Jugadores");
+        // BOTÓN CREAR (Verde por defecto)
+        JButton btnCrear = new JButton("Crear Equipo");
         Estilo.decorarBoton(btnCrear);
         btnCrear.addActionListener(e -> crearNuevoEquipo());
         
-        // BOTÓN EDITAR (Centralizado)
-        JButton btnEditar = new JButton("Editar Equipo (Nombre/Jugadores)");
+        // BOTÓN EDITAR (AZUL)
+        JButton btnEditar = new JButton("Editar Equipo");
         Estilo.decorarBoton(btnEditar);
+        btnEditar.setBackground(Estilo.COLOR_AZUL); // Color Azul
         btnEditar.addActionListener(e -> editarEquipo());
         
-        // BOTÓN ELIMINAR
+        // BOTÓN ELIMINAR (ROJO)
         JButton btnEliminar = new JButton("Eliminar Equipo");
         Estilo.decorarBoton(btnEliminar);
+        btnEliminar.setBackground(Estilo.COLOR_OCUPADO); // Color Rojo
         btnEliminar.addActionListener(e -> eliminarEquipo());
         
         // BOTÓN VOLVER
@@ -71,12 +87,33 @@ public class PanelGestionEquipos extends JPanel {
     }
 
     public void actualizar() {
-        StringBuilder sb = new StringBuilder();
+        // Limpiar tabla
+        tableModel.setRowCount(0);
+        
+        // Llenar con datos
         for (Equipo e : gestor.getEquiposRegistrados()) {
-            sb.append(e.toString());
-            sb.append("--------------------------------\n");
+            String j1 = "---";
+            String j2 = "---";
+            
+            List<Jugador> jugadores = e.getJugadores();
+            if (jugadores.size() > 0 && jugadores.get(0) != null) {
+                j1 = jugadores.get(0).getNombre() + " " + jugadores.get(0).getApellido();
+            }
+            if (jugadores.size() > 1 && jugadores.get(1) != null) {
+                j2 = jugadores.get(1).getNombre() + " " + jugadores.get(1).getApellido();
+            }
+            
+            String stats = e.getPartidosGanados() + " / " + e.getPartidosPerdidos();
+            
+            Object[] fila = {
+                e.getNombre(),
+                j1,
+                j2,
+                stats,
+                e.getTorneosGanados()
+            };
+            tableModel.addRow(fila);
         }
-        equiposTextArea.setText(sb.toString());
     }
 
     private void crearNuevoEquipo() {
@@ -89,7 +126,7 @@ public class PanelGestionEquipos extends JPanel {
         form.add(new JLabel("DNI Jugador 1:")); form.add(dni1Field);
         form.add(new JLabel("DNI Jugador 2:")); form.add(dni2Field);
 
-        int result = JOptionPane.showConfirmDialog(this, form, "Crear Equipo (2 Jugadores)", JOptionPane.OK_CANCEL_OPTION);
+        int result = JOptionPane.showConfirmDialog(this, form, "Crear Equipo (2 Jugadores)", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             try {
                 // 1. Validar y buscar jugadores
@@ -130,17 +167,22 @@ public class PanelGestionEquipos extends JPanel {
             return;
         }
         
-        // Precargar datos
+        // Precargar datos actuales
+        String dniJ1 = "";
+        String dniJ2 = "";
+        if (equipo.getJugadores().size() > 0) dniJ1 = equipo.getJugadores().get(0).getDni();
+        if (equipo.getJugadores().size() > 1) dniJ2 = equipo.getJugadores().get(1).getDni();
+
         JTextField nombreField = new JTextField(equipo.getNombre());
-        JTextField dni1Field = new JTextField(equipo.getJugadores().size() > 0 ? equipo.getJugadores().get(0).getDni() : "");
-        JTextField dni2Field = new JTextField(equipo.getJugadores().size() > 1 ? equipo.getJugadores().get(1).getDni() : "");
+        JTextField dni1Field = new JTextField(dniJ1);
+        JTextField dni2Field = new JTextField(dniJ2);
         
         JPanel form = new JPanel(new GridLayout(0, 2, 5, 5));
         form.add(new JLabel("Nuevo Nombre:")); form.add(nombreField);
         form.add(new JLabel("DNI Jugador 1:")); form.add(dni1Field);
         form.add(new JLabel("DNI Jugador 2:")); form.add(dni2Field);
 
-        int result = JOptionPane.showConfirmDialog(this, form, "Editar Equipo: " + equipo.getNombre(), JOptionPane.OK_CANCEL_OPTION);
+        int result = JOptionPane.showConfirmDialog(this, form, "Editar Equipo: " + equipo.getNombre(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             try {
                 String nuevoNombre = nombreField.getText().trim();

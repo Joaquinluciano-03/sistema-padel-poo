@@ -4,13 +4,15 @@ import controlador.GestorSistema;
 import excepciones.JugadorYaExisteException;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import modelo.Jugador;
 import util.Estilo;
 
 public class PanelGestionJugadores extends JPanel {
 
     private GestorSistema gestor;
-    private JTextArea jugadoresTextArea;
+    private JTable tablaJugadores;
+    private DefaultTableModel tableModel;
 
     public PanelGestionJugadores(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
@@ -23,15 +25,22 @@ public class PanelGestionJugadores extends JPanel {
         // Título del Panel
         this.add(Estilo.crearTitulo("Gestión de Jugadores"), BorderLayout.NORTH);
 
-        // --- ÁREA DE TEXTO DE JUGADORES ---
-        jugadoresTextArea = new JTextArea(15, 50);
-        jugadoresTextArea.setEditable(false);
-        jugadoresTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        jugadoresTextArea.setBackground(Estilo.BLANCO); 
-        jugadoresTextArea.setForeground(Estilo.COLOR_TEXTO); 
+        // --- TABLA DE JUGADORES ---
+        String[] columnas = {"Nombre", "Apellido", "DNI", "Posición", "Nivel", "Partidos (G/P)"};
+        tableModel = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // La tabla no es editable directamente
+            }
+        };
         
-        JScrollPane scrollPane = new JScrollPane(jugadoresTextArea);
+        tablaJugadores = new JTable(tableModel);
+        Estilo.decorarTabla(tablaJugadores); // Aplicar estilo personalizado
+        
+        JScrollPane scrollPane = new JScrollPane(tablaJugadores);
+        scrollPane.getViewport().setBackground(Estilo.BLANCO);
         scrollPane.setBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL, 1));
+        
         this.add(scrollPane, BorderLayout.CENTER);
 
         // --- PANEL DE BOTONES ---
@@ -42,17 +51,21 @@ public class PanelGestionJugadores extends JPanel {
         Estilo.decorarBoton(btnRegistrar);
         btnRegistrar.addActionListener(e -> registrarNuevoJugador());
         
+        // BOTÓN MODIFICAR (AZUL)
         JButton btnModificar = new JButton("Modificar Jugador");
         Estilo.decorarBoton(btnModificar);
+        btnModificar.setBackground(Estilo.COLOR_AZUL); // Aplicamos color específico
         btnModificar.addActionListener(e -> modificarJugador());
 
+        // BOTÓN ELIMINAR (ROJO)
         JButton btnEliminar = new JButton("Eliminar Jugador");
         Estilo.decorarBoton(btnEliminar);
+        btnEliminar.setBackground(Estilo.COLOR_OCUPADO); // Aplicamos color específico
         btnEliminar.addActionListener(e -> eliminarJugador());
         
         JButton btnVolver = new JButton("Volver al Menú Principal");
         Estilo.decorarBoton(btnVolver);
-        btnVolver.setBackground(Estilo.COLOR_TEXTO); // Color secundario para "Volver"
+        btnVolver.setBackground(Estilo.COLOR_TEXTO); 
         btnVolver.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
         
         botonesPanel.add(btnRegistrar);
@@ -64,14 +77,22 @@ public class PanelGestionJugadores extends JPanel {
     }
 
     public void actualizar() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%-25s %-12s %-10s %-5s %s\n", "Nombre y Apellido", "DNI", "Posición", "Nivel", "G/P"));
-        sb.append("--------------------------------------------------------------------\n");
+        // Limpiar tabla
+        tableModel.setRowCount(0);
+        
+        // Llenar con datos actualizados
         for (Jugador j : gestor.getJugadoresRegistrados()) {
-            String nombreCompleto = j.getNombre() + " " + j.getApellido();
-            sb.append(String.format("%-25.25s %-12s %-10s %-5d %d/%d\n", nombreCompleto, j.getDni(), j.getPosicion(), j.getNivel(), j.getPartidosGanados(), j.getPartidosPerdidos()));
+            String stats = j.getPartidosGanados() + " / " + j.getPartidosPerdidos();
+            Object[] fila = {
+                j.getNombre(),
+                j.getApellido(),
+                j.getDni(),
+                j.getPosicion(),
+                j.getNivel(),
+                stats
+            };
+            tableModel.addRow(fila);
         }
-        jugadoresTextArea.setText(sb.toString());
     }
 
     private void registrarNuevoJugador() {
@@ -80,6 +101,7 @@ public class PanelGestionJugadores extends JPanel {
         JTextField dniField = new JTextField(10);
         JTextField posField = new JTextField(10);
         JTextField nivelField = new JTextField(5);
+        
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
         formPanel.add(new JLabel("Nombre:")); formPanel.add(nombreField);
         formPanel.add(new JLabel("Apellido:")); formPanel.add(apellidoField);

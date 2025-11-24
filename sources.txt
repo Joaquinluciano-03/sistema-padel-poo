@@ -1,3 +1,4 @@
+C:\Users\joalu\OneDrive\Desktop\sistemaPadel\app\GeneradorDatos.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\app\Main.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\controlador\GestorSistema.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\excepciones\EquipoCompletoException.java
@@ -24,6 +25,7 @@ C:\Users\joalu\OneDrive\Desktop\sistemaPadel\servicios\IJugadorServicio.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\servicios\JugadorServicio.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\util\Estilo.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\util\Ranking.java
+C:\Users\joalu\OneDrive\Desktop\sistemaPadel\util\SelectorFecha.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\util\ValidadorHorario.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\vista\PanelDisponibilidadCanchas.java
 C:\Users\joalu\OneDrive\Desktop\sistemaPadel\vista\PanelGestionArbitros.java

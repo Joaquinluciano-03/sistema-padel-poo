@@ -4,13 +4,15 @@ import controlador.GestorSistema;
 import excepciones.JugadorYaExisteException;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import modelo.Arbitro;
 import util.Estilo;
 
 public class PanelGestionArbitros extends JPanel {
 
     private GestorSistema gestor;
-    private JTextArea arbitrosTextArea;
+    private JTable tablaArbitros;
+    private DefaultTableModel tableModel;
 
     public PanelGestionArbitros(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
@@ -23,36 +25,49 @@ public class PanelGestionArbitros extends JPanel {
         // Título del Panel
         this.add(Estilo.crearTitulo("Gestión de Árbitros"), BorderLayout.NORTH);
 
-        // --- ÁREA DE TEXTO DE ÁRBITROS ---
-        arbitrosTextArea = new JTextArea(15, 50);
-        arbitrosTextArea.setEditable(false);
-        arbitrosTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        arbitrosTextArea.setBackground(Estilo.BLANCO); 
-        arbitrosTextArea.setForeground(Estilo.COLOR_TEXTO); 
+        // --- TABLA DE ÁRBITROS ---
+        String[] columnas = {"Nombre", "Apellido", "DNI", "Licencia"};
+        tableModel = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // La tabla no es editable directamente
+            }
+        };
         
-        JScrollPane scrollPane = new JScrollPane(arbitrosTextArea);
+        tablaArbitros = new JTable(tableModel);
+        Estilo.decorarTabla(tablaArbitros);
+        
+        JScrollPane scrollPane = new JScrollPane(tablaArbitros);
+        scrollPane.getViewport().setBackground(Estilo.BLANCO);
         scrollPane.setBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL, 1));
+        
         this.add(scrollPane, BorderLayout.CENTER);
 
         // --- PANEL DE BOTONES ---
         JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         Estilo.decorarPanel(botonesPanel);
 
+        // BOTÓN REGISTRAR (Verde por defecto)
         JButton btnRegistrar = new JButton("Registrar Árbitro");
         Estilo.decorarBoton(btnRegistrar);
         btnRegistrar.addActionListener(e -> registrarNuevoArbitro());
         
+        // BOTÓN MODIFICAR (AZUL)
         JButton btnModificar = new JButton("Modificar Árbitro");
         Estilo.decorarBoton(btnModificar);
+        btnModificar.setBackground(Estilo.COLOR_AZUL); // Color Azul
         btnModificar.addActionListener(e -> modificarArbitro());
 
+        // BOTÓN ELIMINAR (ROJO)
         JButton btnEliminar = new JButton("Eliminar Árbitro");
         Estilo.decorarBoton(btnEliminar);
+        btnEliminar.setBackground(Estilo.COLOR_OCUPADO); // Color Rojo
         btnEliminar.addActionListener(e -> eliminarArbitro());
         
+        // BOTÓN VOLVER
         JButton btnVolver = new JButton("Volver al Menú Principal");
         Estilo.decorarBoton(btnVolver);
-        btnVolver.setBackground(Estilo.COLOR_TEXTO); // Color secundario para "Volver"
+        btnVolver.setBackground(Estilo.COLOR_TEXTO);
         btnVolver.addActionListener(e -> cardLayout.show(mainPanel, "MENU"));
         
         botonesPanel.add(btnRegistrar);
@@ -64,14 +79,19 @@ public class PanelGestionArbitros extends JPanel {
     }
 
     public void actualizar() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%-25s %-12s %-15s\n", "Nombre y Apellido", "DNI", "Licencia"));
-        sb.append("--------------------------------------------------------------------\n");
+        // Limpiar tabla
+        tableModel.setRowCount(0);
+        
+        // Llenar con datos
         for (Arbitro a : gestor.getArbitrosRegistrados()) {
-            String nombreCompleto = a.getNombre() + " " + a.getApellido();
-            sb.append(String.format("%-25.25s %-12s %-15s\n", nombreCompleto, a.getDni(), a.getLicencia()));
+            Object[] fila = {
+                a.getNombre(),
+                a.getApellido(),
+                a.getDni(),
+                a.getLicencia()
+            };
+            tableModel.addRow(fila);
         }
-        arbitrosTextArea.setText(sb.toString());
     }
 
     private void registrarNuevoArbitro() {
@@ -79,6 +99,7 @@ public class PanelGestionArbitros extends JPanel {
         JTextField apellidoField = new JTextField(10);
         JTextField dniField = new JTextField(10);
         JTextField licenciaField = new JTextField(10);
+        
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
         formPanel.add(new JLabel("Nombre:")); formPanel.add(nombreField);
         formPanel.add(new JLabel("Apellido:")); formPanel.add(apellidoField);
@@ -89,7 +110,7 @@ public class PanelGestionArbitros extends JPanel {
 
         if (result == JOptionPane.OK_OPTION) {
             try {
-                // Validación: Evitar duplicado de DNI con jugadores (aunque JugadorServicio ya lo hace)
+                // Validación: Evitar duplicado de DNI con jugadores
                 if (gestor.buscarJugadorPorDni(dniField.getText()) != null) {
                     throw new JugadorYaExisteException("El DNI ya existe en el sistema.", dniField.getText());
                 }

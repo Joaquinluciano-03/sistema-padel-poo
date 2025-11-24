@@ -4,20 +4,24 @@ import controlador.GestorSistema;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import modelo.Equipo;
 import modelo.Jugador;
 import util.Estilo;
 import util.Ranking;
 
 public class PanelRankings extends JPanel {
+    
     private GestorSistema gestor;
-    private JTextArea rankingJugadoresArea;
-    private JTextArea rankingEquiposArea;
+    private JTable tablaJugadores;
+    private JTable tablaEquipos;
+    private DefaultTableModel modeloJugadores;
+    private DefaultTableModel modeloEquipos;
 
     public PanelRankings(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
         
-        // --- APLICACIÓN DE ESTILO AL PANEL ---
+        // --- APLICACIÓN DE ESTILO AL PANEL PRINCIPAL ---
         Estilo.decorarPanel(this);
         this.setLayout(new BorderLayout(20, 20));
         this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -26,17 +30,24 @@ public class PanelRankings extends JPanel {
         this.add(Estilo.crearTitulo("Rankings por Ratio de Victorias"), BorderLayout.NORTH);
 
         // --- CONTENEDOR DE RANKINGS (Dos columnas) ---
-        JPanel rankingsPanel = new JPanel(new GridLayout(1, 2, 20, 20)); // Espacio horizontal de 20
+        JPanel rankingsPanel = new JPanel(new GridLayout(1, 2, 20, 0)); // 1 fila, 2 columnas, espacio horizontal
         Estilo.decorarPanel(rankingsPanel);
 
-        // --- RANKING DE JUGADORES ---
-        rankingJugadoresArea = new JTextArea();
-        rankingJugadoresArea.setEditable(false);
-        rankingJugadoresArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
-        rankingJugadoresArea.setBackground(Estilo.BLANCO);
-        rankingJugadoresArea.setForeground(Estilo.COLOR_TEXTO);
+        // --- 1. TABLA DE JUGADORES (Izquierda) ---
+        String[] colJugadores = {"#", "Jugador", "G/P", "Ratio %"};
+        modeloJugadores = new DefaultTableModel(colJugadores, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tablaJugadores = new JTable(modeloJugadores);
+        Estilo.decorarTabla(tablaJugadores);
         
-        JScrollPane scrollJugadores = new JScrollPane(rankingJugadoresArea);
+        // Ajuste de ancho de columnas para que el # sea pequeño
+        tablaJugadores.getColumnModel().getColumn(0).setPreferredWidth(30);
+        tablaJugadores.getColumnModel().getColumn(1).setPreferredWidth(150);
+
+        JScrollPane scrollJugadores = new JScrollPane(tablaJugadores);
+        scrollJugadores.getViewport().setBackground(Estilo.BLANCO);
         scrollJugadores.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), 
             "Ranking de Jugadores", 
@@ -47,14 +58,20 @@ public class PanelRankings extends JPanel {
         ));
         rankingsPanel.add(scrollJugadores);
 
-        // --- RANKING DE EQUIPOS ---
-        rankingEquiposArea = new JTextArea();
-        rankingEquiposArea.setEditable(false);
-        rankingEquiposArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
-        rankingEquiposArea.setBackground(Estilo.BLANCO);
-        rankingEquiposArea.setForeground(Estilo.COLOR_TEXTO);
+        // --- 2. TABLA DE EQUIPOS (Derecha) ---
+        String[] colEquipos = {"#", "Equipo", "G/P", "Ratio %"};
+        modeloEquipos = new DefaultTableModel(colEquipos, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tablaEquipos = new JTable(modeloEquipos);
+        Estilo.decorarTabla(tablaEquipos);
         
-        JScrollPane scrollEquipos = new JScrollPane(rankingEquiposArea);
+        tablaEquipos.getColumnModel().getColumn(0).setPreferredWidth(30);
+        tablaEquipos.getColumnModel().getColumn(1).setPreferredWidth(150);
+        
+        JScrollPane scrollEquipos = new JScrollPane(tablaEquipos);
+        scrollEquipos.getViewport().setBackground(Estilo.BLANCO);
         scrollEquipos.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), 
             "Ranking de Equipos", 
@@ -81,32 +98,42 @@ public class PanelRankings extends JPanel {
     }
 
     public void actualizar() {
-        // --- Ranking Jugadores ---
+        // --- Actualizar Tabla Jugadores ---
+        modeloJugadores.setRowCount(0);
         List<Jugador> jugadores = gestor.getJugadoresRegistrados();
         Ranking.ordenarJugadoresPorRatio(jugadores);
-        StringBuilder sbJugadores = new StringBuilder();
-        sbJugadores.append(String.format("%-4s %-25s %-10s %-7s\n", "#", "Jugador", "(G/P)", "Ratio %"));
-        sbJugadores.append("----------------------------------------------------\n");
+        
         int i = 1;
         for (Jugador j : jugadores) {
             int total = j.getPartidosGanados() + j.getPartidosPerdidos();
             double ratio = total == 0 ? 0 : (double)j.getPartidosGanados() / total * 100;
-            sbJugadores.append(String.format("%-4d %-25.25s (%-2d/%-2d)  %.1f%%\n", i++, j.getNombre() + " " + j.getApellido(), j.getPartidosGanados(), j.getPartidosPerdidos(), ratio));
+            
+            Object[] fila = {
+                i++,
+                j.getNombre() + " " + j.getApellido(),
+                j.getPartidosGanados() + "/" + j.getPartidosPerdidos(),
+                String.format("%.1f%%", ratio)
+            };
+            modeloJugadores.addRow(fila);
         }
-        rankingJugadoresArea.setText(sbJugadores.toString());
         
-        // --- Ranking Equipos ---
+        // --- Actualizar Tabla Equipos ---
+        modeloEquipos.setRowCount(0);
         List<Equipo> equipos = gestor.getEquiposRegistrados();
         Ranking.ordenarEquiposPorRatio(equipos);
-        StringBuilder sbEquipos = new StringBuilder();
-        sbEquipos.append(String.format("%-4s %-25s %-10s %-7s\n", "#", "Equipo", "(G/P)", "Ratio %"));
-        sbEquipos.append("----------------------------------------------------\n");
+        
         i = 1;
         for (Equipo e : equipos) {
             int total = e.getPartidosGanados() + e.getPartidosPerdidos();
             double ratio = total == 0 ? 0 : (double)e.getPartidosGanados() / total * 100;
-            sbEquipos.append(String.format("%-4d %-25.25s (%-2d/%-2d)  %.1f%%\n", i++, e.getNombre(), e.getPartidosGanados(), e.getPartidosPerdidos(), ratio));
+            
+            Object[] fila = {
+                i++,
+                e.getNombre(),
+                e.getPartidosGanados() + "/" + e.getPartidosPerdidos(),
+                String.format("%.1f%%", ratio)
+            };
+            modeloEquipos.addRow(fila);
         }
-        rankingEquiposArea.setText(sbEquipos.toString());
     }
 }
