@@ -28,11 +28,11 @@ public class PanelGestionSedes extends JPanel {
 
         this.add(Estilo.crearTitulo("Gestión de Sedes y Canchas"), BorderLayout.NORTH);
 
-        // --- PANEL CENTRAL (TABLAS MAESTRO-DETALLE) ---
+        // PANEL CENTRAL
         JPanel centroPanel = new JPanel(new GridLayout(2, 1, 0, 20));
         Estilo.decorarPanel(centroPanel);
 
-        // 1. TABLA SEDES
+        //TABLA SEDES
         JPanel panelSedes = new JPanel(new BorderLayout(5, 5));
         Estilo.decorarPanel(panelSedes);
         panelSedes.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), "1. Listado de Sedes (Seleccione una)"));
@@ -54,7 +54,7 @@ public class PanelGestionSedes extends JPanel {
         scrollSedes.getViewport().setBackground(Estilo.BLANCO);
         panelSedes.add(scrollSedes, BorderLayout.CENTER);
 
-        // 2. TABLA CANCHAS
+        // TABLA CANCHAS
         JPanel panelCanchas = new JPanel(new BorderLayout(5, 5));
         Estilo.decorarPanel(panelCanchas);
         panelCanchas.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), "2. Canchas de la Sede"));
@@ -76,7 +76,6 @@ public class PanelGestionSedes extends JPanel {
         this.add(centroPanel, BorderLayout.CENTER);
 
 
-        // --- PANEL LATERAL DE BOTONES ---
         JPanel botonesPanel = new JPanel(new GridLayout(2, 1, 10, 20)); 
         Estilo.decorarPanel(botonesPanel);
         botonesPanel.setPreferredSize(new Dimension(200, 0));
@@ -188,7 +187,6 @@ public class PanelGestionSedes extends JPanel {
         }
     }
 
-    // --- MÉTODOS DE ACCIÓN ---
     
     private void crearSede() {
         JTextField nombreField = new JTextField();

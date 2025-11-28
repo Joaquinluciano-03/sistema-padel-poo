@@ -11,15 +11,15 @@ import modelo.Torneo;
 public interface ICompeticionServicio {
     
     // Gestión de Sedes
-    void agregarSede(Sede sede) throws IllegalArgumentException; // Ahora lanza excepción
+    void agregarSede(Sede sede) throws IllegalArgumentException; 
     Sede buscarSedePorNombre(String nombre);
     List<Sede> getSedes();
     boolean modificarSede(String nombreActual, String nuevoNombre, String nuevaDireccion);
-    boolean eliminarSede(String nombre); // NUEVO
+    boolean eliminarSede(String nombre); 
     
     // Gestión de Canchas
     boolean modificarCancha(String nombreSede, int numeroCancha, String nuevaSuperficie, boolean nuevaIluminacion);
-    boolean eliminarCancha(Sede sede, int numeroCancha); // NUEVO
+    boolean eliminarCancha(Sede sede, int numeroCancha); 
 
     // Gestión de Torneos y Partidos
     void registrarTorneo(Torneo torneo);

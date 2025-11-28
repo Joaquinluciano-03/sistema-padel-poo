@@ -21,7 +21,6 @@ public class PanelRankings extends JPanel {
     public PanelRankings(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
         
-        // --- APLICACIÓN DE ESTILO AL PANEL PRINCIPAL ---
         Estilo.decorarPanel(this);
         this.setLayout(new BorderLayout(20, 20));
         this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -29,11 +28,11 @@ public class PanelRankings extends JPanel {
         // Título del Panel
         this.add(Estilo.crearTitulo("Rankings por Ratio de Victorias"), BorderLayout.NORTH);
 
-        // --- CONTENEDOR DE RANKINGS (Dos columnas) ---
+        // CONTENEDOR DE RANKINGS 
         JPanel rankingsPanel = new JPanel(new GridLayout(1, 2, 20, 0)); // 1 fila, 2 columnas, espacio horizontal
         Estilo.decorarPanel(rankingsPanel);
 
-        // --- 1. TABLA DE JUGADORES (Izquierda) ---
+        // TABLA DE JUGADORES-
         String[] colJugadores = {"#", "Jugador", "G/P", "Ratio %"};
         modeloJugadores = new DefaultTableModel(colJugadores, 0) {
             @Override
@@ -58,7 +57,7 @@ public class PanelRankings extends JPanel {
         ));
         rankingsPanel.add(scrollJugadores);
 
-        // --- 2. TABLA DE EQUIPOS (Derecha) ---
+        // TABLA DE EQUIPOS
         String[] colEquipos = {"#", "Equipo", "G/P", "Ratio %"};
         modeloEquipos = new DefaultTableModel(colEquipos, 0) {
             @Override
@@ -84,7 +83,7 @@ public class PanelRankings extends JPanel {
         
         this.add(rankingsPanel, BorderLayout.CENTER);
         
-        // --- BOTÓN VOLVER ---
+        // BOTÓN VOLVER
         JPanel surPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         Estilo.decorarPanel(surPanel);
         
@@ -98,7 +97,7 @@ public class PanelRankings extends JPanel {
     }
 
     public void actualizar() {
-        // --- Actualizar Tabla Jugadores ---
+        //Actualizar Tabla Jugadores
         modeloJugadores.setRowCount(0);
         List<Jugador> jugadores = gestor.getJugadoresRegistrados();
         Ranking.ordenarJugadoresPorRatio(jugadores);
@@ -117,7 +116,7 @@ public class PanelRankings extends JPanel {
             modeloJugadores.addRow(fila);
         }
         
-        // --- Actualizar Tabla Equipos ---
+        // Actualizar Tabla Equipos
         modeloEquipos.setRowCount(0);
         List<Equipo> equipos = gestor.getEquiposRegistrados();
         Ranking.ordenarEquiposPorRatio(equipos);

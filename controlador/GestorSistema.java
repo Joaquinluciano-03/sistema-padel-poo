@@ -36,7 +36,7 @@ public class GestorSistema {
         }
     }
     
-    // --- MÉTODOS DE REGISTRO ---
+    // MÉTODOS DE REGISTRO 
     
     public void agregarSede(Sede sede) throws IllegalArgumentException {
         competicionServicio.agregarSede(sede);
@@ -81,7 +81,7 @@ public class GestorSistema {
         guardar();
     }
     
-    // --- MÉTODOS DE PERSISTENCIA (Partidos Sueltos) ---
+    //MÉTODOS DE PERSISTENCIA (Partidos Sueltos) 
     public List<Partido> getPartidosSuetos() {
         return competicionServicio.getPartidosSuetos();
     }
@@ -90,12 +90,12 @@ public class GestorSistema {
         competicionServicio.setPartidosSuetos(partidos);
     }
     
-    // --- VALIDACIÓN ---
+    //  VALIDACIÓN
     public boolean validarDisponibilidadCancha(Cancha cancha, LocalDateTime inicio, int duracionMinutos) {
         return competicionServicio.validarDisponibilidadCancha(cancha, inicio, duracionMinutos);
     }
 
-    // --- MODIFICACIÓN ---
+    //  MODIFICACIÓN 
     public boolean modificarJugador(String dni, String nuevoNombre, String nuevoApellido, String nuevaPosicion, int nuevoNivel) {
         boolean exito = jugadorServicio.modificar(dni, nuevoNombre, nuevoApellido, nuevaPosicion, nuevoNivel);
         if (exito) guardar();
@@ -129,7 +129,7 @@ public class GestorSistema {
         return exito;
     }
     
-    // --- FINALIZACIÓN ---
+    // - FINALIZACIÓN 
     public void finalizarPartido(Partido partido, String resultado, Equipo ganador) {
         if (partido == null || partido.isFinalizado()) return;
         
@@ -155,7 +155,7 @@ public class GestorSistema {
         guardar();
     }
     
-    // --- ELIMINACIÓN ---
+    // ELIMINACIÓN
     public boolean eliminarJugador(String dni) {
         // Primero eliminar de equipos para integridad
         Jugador j = jugadorServicio.buscarPorDni(dni);
@@ -214,11 +214,10 @@ public class GestorSistema {
         return eliminado;
     }
     
-    // --- GETTERS DELEGADOS ---
+    //  GETTERS DELEGADOS 
     public List<Sede> getSedes() { return competicionServicio.getSedes(); }
     public List<Jugador> getJugadoresRegistrados() { return jugadorServicio.getTodos(); }
     
-    // FIX: Ahora usamos el servicio correcto
     public List<Arbitro> getArbitrosRegistrados() { return arbitroServicio.getTodos(); } 
     public Arbitro buscarArbitroPorDni(String dni) { return arbitroServicio.buscarPorDni(dni); }
     

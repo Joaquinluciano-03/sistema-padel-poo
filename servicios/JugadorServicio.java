@@ -11,7 +11,6 @@ import modelo.Jugador;
  */
 public class JugadorServicio implements IJugadorServicio { // Implementa la interfaz IJugadorServicio
     private List<Jugador> jugadoresRegistrados = new ArrayList<>();
-    // La colección 'arbitrosRegistrados' ha sido ELIMINADA.
 
     @Override
     public void registrar(Jugador jugador) throws JugadorYaExisteException {
@@ -59,6 +58,4 @@ public class JugadorServicio implements IJugadorServicio { // Implementa la inte
         return jugadoresRegistrados;
     }
 
-    // Los métodos previamente existentes para Arbitro (registrar, modificarArbitro, eliminarArbitro, etc.)
-    // han sido ELIMINADOS de esta clase y movidos a ArbitroServicio.java.
 }

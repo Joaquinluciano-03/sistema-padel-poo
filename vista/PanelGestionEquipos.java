@@ -20,7 +20,6 @@ public class PanelGestionEquipos extends JPanel {
     public PanelGestionEquipos(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
         
-        // --- APLICACIÓN DE ESTILO AL PANEL ---
         Estilo.decorarPanel(this);
         this.setLayout(new BorderLayout(15, 15));
         this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -28,19 +27,18 @@ public class PanelGestionEquipos extends JPanel {
         // Título del Panel
         this.add(Estilo.crearTitulo("Gestión de Equipos"), BorderLayout.NORTH);
 
-        // --- TABLA DE EQUIPOS ---
+        // TABLA DE EQUIPOS
         String[] columnas = {"Nombre Equipo", "Jugador 1", "Jugador 2", "Partidos (G/P)", "Torneos G."};
         tableModel = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // La tabla no es editable directamente
+                return false;
             }
         };
         
         tablaEquipos = new JTable(tableModel);
         Estilo.decorarTabla(tablaEquipos);
         
-        // Ajustar ancho de columnas para mejor visualización
         tablaEquipos.getColumnModel().getColumn(0).setPreferredWidth(150); // Nombre equipo
         tablaEquipos.getColumnModel().getColumn(1).setPreferredWidth(150); // Jugador 1
         tablaEquipos.getColumnModel().getColumn(2).setPreferredWidth(150); // Jugador 2
@@ -51,7 +49,7 @@ public class PanelGestionEquipos extends JPanel {
         
         this.add(scrollPane, BorderLayout.CENTER);
 
-        // --- PANEL DE BOTONES ---
+        // PANEL DE BOTONES
         JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         Estilo.decorarPanel(botonesPanel);
 
@@ -129,7 +127,7 @@ public class PanelGestionEquipos extends JPanel {
         int result = JOptionPane.showConfirmDialog(this, form, "Crear Equipo (2 Jugadores)", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             try {
-                // 1. Validar y buscar jugadores
+                // Validar y buscar jugadores
                 Jugador j1 = gestor.buscarJugadorPorDni(dni1Field.getText());
                 Jugador j2 = gestor.buscarJugadorPorDni(dni2Field.getText());
                 
@@ -144,7 +142,7 @@ public class PanelGestionEquipos extends JPanel {
                 
                 List<Jugador> jugadores = Arrays.asList(j1, j2);
                 
-                // 2. Registrar equipo con los 2 jugadores
+                // Registrar equipo con los 2 jugadores
                 gestor.registrarEquipo(new Equipo(nombreField.getText().trim(), jugadores));
                 actualizar();
                 JOptionPane.showMessageDialog(this, "Equipo creado y guardado.");
@@ -187,7 +185,7 @@ public class PanelGestionEquipos extends JPanel {
             try {
                 String nuevoNombre = nombreField.getText().trim();
                 
-                // 1. Validar y buscar nuevos jugadores
+                // Validar y buscar nuevos jugadores
                 Jugador j1 = gestor.buscarJugadorPorDni(dni1Field.getText());
                 Jugador j2 = gestor.buscarJugadorPorDni(dni2Field.getText());
                 
@@ -202,7 +200,7 @@ public class PanelGestionEquipos extends JPanel {
                 
                 List<Jugador> nuevosJugadores = Arrays.asList(j1, j2);
 
-                // 2. Llamar al método centralizado de edición
+                // Llamar al método centralizado de edición
                 gestor.editarEquipo(nombreActual, nuevoNombre, nuevosJugadores);
                 
                 actualizar();

@@ -91,7 +91,6 @@ public class PanelDisponibilidadCanchas extends JPanel {
         tablaDisponibilidad = new JTable(tableModel);
         Estilo.decorarTabla(tablaDisponibilidad);
 
-        // --- RENDERIZADOR PERSONALIZADO MEJORADO ---
         tablaDisponibilidad.setDefaultRenderer(Object.class, new TableCellRenderer() {
             private final DefaultTableCellRenderer defaultRenderer = new DefaultTableCellRenderer();
             

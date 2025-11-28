@@ -28,7 +28,6 @@ public class PanelGestionCompeticiones extends JPanel {
     private JTable tablaPartidos;
     private DefaultTableModel modeloPartidos;
     
-    // Listas auxiliares para mapear filas a objetos reales
     private List<Torneo> listaTorneosActuales;
     private List<Partido> listaPartidosActuales;
 
@@ -44,11 +43,11 @@ public class PanelGestionCompeticiones extends JPanel {
 
         this.add(Estilo.crearTitulo("Gestión de Competiciones Activas"), BorderLayout.NORTH);
 
-        // --- CENTRO: TABLAS ---
+        // TABLAS
         JPanel centroPanel = new JPanel(new GridLayout(2, 1, 0, 20));
         Estilo.decorarPanel(centroPanel);
 
-        // 1. TABLA TORNEOS ACTIVOS
+        // TABLA TORNEOS ACTIVOS
         JPanel panelTorneos = new JPanel(new BorderLayout(5, 5));
         Estilo.decorarPanel(panelTorneos);
         panelTorneos.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), "Torneos Activos (Seleccione para gestionar)"));
@@ -61,7 +60,7 @@ public class PanelGestionCompeticiones extends JPanel {
         Estilo.decorarTabla(tablaTorneos);
         panelTorneos.add(new JScrollPane(tablaTorneos), BorderLayout.CENTER);
 
-        // 2. TABLA PARTIDOS PENDIENTES
+        // TABLA PARTIDOS PENDIENTES
         JPanel panelPartidos = new JPanel(new BorderLayout(5, 5));
         Estilo.decorarPanel(panelPartidos);
         panelPartidos.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Estilo.COLOR_PRINCIPAL), "Partidos Pendientes (Seleccione para finalizar)"));
@@ -78,7 +77,7 @@ public class PanelGestionCompeticiones extends JPanel {
         centroPanel.add(panelPartidos);
         this.add(centroPanel, BorderLayout.CENTER);
 
-        // --- DERECHA: BOTONES DE ACCIÓN ---
+        // BOTONES DE ACCIÓN
         JPanel lateralPanel = new JPanel(new BorderLayout(10, 10));
         Estilo.decorarPanel(lateralPanel);
         lateralPanel.setPreferredSize(new Dimension(220, 0));
@@ -95,7 +94,7 @@ public class PanelGestionCompeticiones extends JPanel {
         Estilo.decorarBoton(btnCrearPartido);
         btnCrearPartido.addActionListener(e -> crearPartidoSueltoCompleto()); // Usamos el método completo
 
-        // Grupo TORNEO (Actúan sobre la selección de tablaTorneos)
+        // Grupo TORNEO
         JButton btnInscribir = new JButton("Inscribir Equipo");
         Estilo.decorarBoton(btnInscribir);
         btnInscribir.setBackground(Estilo.COLOR_AZUL);
@@ -111,7 +110,7 @@ public class PanelGestionCompeticiones extends JPanel {
         btnEliminarTorneo.setBackground(Estilo.COLOR_OCUPADO);
         btnEliminarTorneo.addActionListener(e -> eliminarTorneo());
 
-        // Grupo PARTIDO (Actúan sobre selección de tablaPartidos)
+        // Grupo PARTIDO 
         JButton btnFinalizarPartido = new JButton("Registrar Resultado");
         Estilo.decorarBoton(btnFinalizarPartido);
         btnFinalizarPartido.setBackground(Estilo.COLOR_AZUL);
@@ -175,7 +174,7 @@ public class PanelGestionCompeticiones extends JPanel {
         }
     }
 
-    // --- LÓGICA DE BOTONES ---
+    // LÓGICA DE BOTONES
 
     private void crearTorneo() {
         JTextField nombreField = new JTextField();
@@ -277,13 +276,12 @@ public class PanelGestionCompeticiones extends JPanel {
         }
     }
     
-    // --- MÉTODO COMPLETO DE CREACIÓN DE PARTIDO (CON VALIDACIÓN) ---
+    // CREACIÓN DE PARTIDO (CON VALIDACIÓN)
     private void crearPartidoSueltoCompleto() {
         if (gestor.getEquiposRegistrados().size() < 2 || gestor.getSedes().isEmpty() || gestor.getArbitrosRegistrados().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Faltan datos (equipos/sedes/arbitros)."); return;
         }
 
-        // Componentes del formulario
         JComboBox<String> localCombo = new JComboBox<>();
         JComboBox<String> visitCombo = new JComboBox<>();
         JComboBox<String> arbitroCombo = new JComboBox<>();
@@ -291,7 +289,6 @@ public class PanelGestionCompeticiones extends JPanel {
         JComboBox<String> sedeCombo = new JComboBox<>();
         JComboBox<String> canchaCombo = new JComboBox<>();
         
-        // Llenar combos
         gestor.getEquiposRegistrados().forEach(e -> {
             localCombo.addItem(e.getNombre());
             visitCombo.addItem(e.getNombre());

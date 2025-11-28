@@ -17,7 +17,6 @@ public class PanelGestionJugadores extends JPanel {
     public PanelGestionJugadores(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
         
-        // --- APLICACIÓN DE ESTILO AL PANEL ---
         Estilo.decorarPanel(this);
         this.setLayout(new BorderLayout(15, 15));
         this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -25,12 +24,12 @@ public class PanelGestionJugadores extends JPanel {
         // Título del Panel
         this.add(Estilo.crearTitulo("Gestión de Jugadores"), BorderLayout.NORTH);
 
-        // --- TABLA DE JUGADORES ---
+        //Tabla jugadores
         String[] columnas = {"Nombre", "Apellido", "DNI", "Posición", "Nivel", "Partidos (G/P)"};
         tableModel = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // La tabla no es editable directamente
+                return false; 
             }
         };
         
@@ -43,7 +42,7 @@ public class PanelGestionJugadores extends JPanel {
         
         this.add(scrollPane, BorderLayout.CENTER);
 
-        // --- PANEL DE BOTONES ---
+        //PANEL DE BOTONES
         JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         Estilo.decorarPanel(botonesPanel);
 

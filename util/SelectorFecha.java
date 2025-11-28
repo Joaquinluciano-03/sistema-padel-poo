@@ -27,7 +27,7 @@ public class SelectorFecha extends JDialog {
         setLocationRelativeTo(owner);
         setResizable(false);
 
-        // --- CABECERA (Navegación) ---
+        // Navegacion
         JPanel panelCabecera = new JPanel(new BorderLayout());
         Estilo.decorarPanel(panelCabecera);
         panelCabecera.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -50,7 +50,7 @@ public class SelectorFecha extends JDialog {
 
         add(panelCabecera, BorderLayout.NORTH);
 
-        // --- CUERPO (Días) ---
+        // Días
         panelDias = new JPanel(new GridLayout(0, 7, 2, 2));
         panelDias.setBackground(Estilo.BLANCO);
         panelDias.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -68,7 +68,6 @@ public class SelectorFecha extends JDialog {
     private void actualizarCalendario() {
         panelDias.removeAll();
 
-        // CORRECCIÓN: Usamos forLanguageTag para evitar la advertencia de "deprecated"
         Locale localeEs = Locale.forLanguageTag("es-ES");
         
         String nombreMes = mesActual.getMonth().getDisplayName(TextStyle.FULL, localeEs);

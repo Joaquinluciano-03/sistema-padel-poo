@@ -7,7 +7,7 @@ import modelo.Jugador;
 
 /**
  * Interfaz que define el contrato para los servicios de gestión de equipos.
- * Cumple con el Principio de Inversión de Dependencias (DIP).
+ * Cumple con el Principio de Inversión de Dependencias
  */
 public interface IEquipoServicio {
     

@@ -7,7 +7,7 @@ import modelo.Cancha;
 import modelo.Partido;
 
 /**
- * Clase responsable de la lógica compleja de validación de horarios y solapamiento
+ * Clase responsable de la lógica de validación de horarios y solapamiento
  * de partidos para una cancha específica. 
  * Cumple con el Principio de Responsabilidad Única (SRP).
  */
@@ -17,8 +17,7 @@ public class ValidadorHorario {
     private final LocalTime HORA_APERTURA = LocalTime.of(8, 0);
     private final LocalTime HORA_CIERRE = LocalTime.of(22, 0);
     
-    // Eliminamos la constante de duración estándar ya que ahora usaremos la real del partido.
-
+   
     /**
      * Verifica si una cancha está disponible en un rango de tiempo específico
      * dentro de una lista de partidos que ya están programados para esa fecha.
@@ -35,25 +34,24 @@ public class ValidadorHorario {
         if (inicio.toLocalTime().isBefore(HORA_APERTURA)) {
             return false;
         }
-        // Si el partido termina después del cierre, no es válido.
-        // Nota: Si termina exactamente a las 22:00, es válido (isAfter es estricto >).
+        // Si el partido termina despues del cierre, no es valido.
+        // Si termina exactamente a las 22:00, es valido (isAfter es estricto >).
         if (fin.toLocalTime().isAfter(HORA_CIERRE) && !fin.toLocalTime().equals(LocalTime.MIDNIGHT)) {
-             // Manejo especial: si termina a las 00:00 del día siguiente, técnicamente se pasó de las 22:00 del día actual.
-             // Pero con la lógica simple de LocalTime, 22:01 es after 22:00.
+             // si termina a las 00:00 del día siguiente, tecnicamente se paso de las 22:00 del día actual
+             // Pero con la lógica simple de LocalTime, 22:01 es after 22:00
              return false;
         }
 
         for (Partido p : partidosDelDia) {
             
             // Filtramos solo partidos que están en la misma cancha
-            // (Importante: Usar equals si está implementado, o comparar IDs/Números)
             if (p.getCancha().getNumero() != cancha.getNumero()) {
                 continue; 
             }
             
             LocalDateTime pInicio = p.getFechaHora();
             
-            // CORRECCIÓN CRÍTICA: Usar la duración real del partido guardado
+            // Usar la duración real del partido guardado
             int duracionReal = p.getDuracionMinutos();
             
             // Si por alguna razón es 0 (datos antiguos), usamos un default de seguridad (ej. 90 min)

@@ -6,7 +6,7 @@ import modelo.Jugador;
 
 /**
  * Interfaz que define el contrato exclusivo para los servicios de gestión de Jugadores.
- * Cumple con el Principio de Segregación de Interfaces (ISP).
+ * Cumple con el Principio de Segregación de Interfaces
  */
 public interface IJugadorServicio {
     

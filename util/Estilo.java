@@ -8,21 +8,21 @@ import javax.swing.table.JTableHeader;
 
 public class Estilo {
 
-    // --- PALETA DE COLORES REFINADA ---
+    //PALETA DE COLORES REFINADA
     public static final Color COLOR_PRINCIPAL = new Color(51, 102, 51); // Verde
     public static final Color COLOR_SECUNDARIO = new Color(102, 153, 102); // Verde claro
     
     // Rojo para Eliminar / Ocupado
     public static final Color COLOR_OCUPADO = new Color(204, 71, 71); 
     
-    // NUEVO: Azul para Modificar / Editar
+    // Azul para Modificar / Editar
     public static final Color COLOR_AZUL = new Color(0, 102, 204); 
     
     public static final Color COLOR_FONDO = new Color(245, 245, 245);
     public static final Color COLOR_TEXTO = new Color(33, 33, 33);
     public static final Color BLANCO = Color.WHITE;
 
-    // --- FUENTES ---
+    // FUENTES
     public static final Font FUENTE_TITULO = new Font("Segoe UI", Font.BOLD, 24);
     public static final Font FUENTE_SUBTITULO = new Font("Segoe UI", Font.BOLD, 14);
     public static final Font FUENTE_NORMAL = new Font("Segoe UI", Font.PLAIN, 14);
@@ -39,7 +39,7 @@ public class Estilo {
         boton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR)); 
         
-        // Efecto Hover Inteligente (Respeta el color asignado)
+        // Efecto Hover (Respeta el color asignado)
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
             private Color colorOriginal;
 

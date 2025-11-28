@@ -25,14 +25,12 @@ public class PanelHistorial extends JPanel {
     public PanelHistorial(GestorSistema gestor, CardLayout cardLayout, JPanel mainPanel) {
         this.gestor = gestor;
         
-        // --- APLICACIÓN DE ESTILO AL PANEL PRINCIPAL ---
         Estilo.decorarPanel(this);
         this.setLayout(new BorderLayout(15, 15));
         this.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         this.add(Estilo.crearTitulo("Historial y Seguimiento de Torneos"), BorderLayout.NORTH);
 
-        // --- PANEL SUPERIOR DE SELECCIÓN ---
         JPanel selectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         Estilo.decorarPanel(selectorPanel);
         
@@ -46,13 +44,12 @@ public class PanelHistorial extends JPanel {
         
         this.add(selectorPanel, BorderLayout.NORTH);
 
-        // --- PANEL DE DETALLES (CENTRO) ---
         detallesPanel = new JPanel();
         detallesPanel.setLayout(new BorderLayout(15, 15));
         Estilo.decorarPanel(detallesPanel);
         this.add(new JScrollPane(detallesPanel), BorderLayout.CENTER); // Contenedor scrollable para detalles
 
-        // --- BOTÓN VOLVER ---
+        // BOTÓN VOLVER
         JPanel surPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         Estilo.decorarPanel(surPanel);
         
@@ -65,7 +62,7 @@ public class PanelHistorial extends JPanel {
         this.add(surPanel, BorderLayout.SOUTH);
     }
     
-    // --- LÓGICA DE ACTUALIZACIÓN ---
+    //  LÓGICA DE ACTUALIZACIÓN 
 
     public void actualizar() {
         // Guarda la selección actual para reestablecerla
@@ -99,11 +96,9 @@ public class PanelHistorial extends JPanel {
         detallesPanel.removeAll();
         detallesPanel.setLayout(new BorderLayout(15, 15));
         
-        // --- 1. PANEL DE RESUMEN (NORTE) ---
         JPanel resumenPanel = crearPanelResumen(t);
         detallesPanel.add(resumenPanel, BorderLayout.NORTH);
 
-        // --- 2. PANEL DE LISTAS (CENTRO) ---
         JPanel listasPanel = crearPanelListas(t);
         detallesPanel.add(listasPanel, BorderLayout.CENTER);
         
@@ -111,7 +106,6 @@ public class PanelHistorial extends JPanel {
         detallesPanel.repaint();
     }
     
-    // --- MÉTODOS DE CONSTRUCCIÓN DE SUBPANELES ---
     
     private JPanel crearPanelResumen(Torneo t) {
         JPanel panel = new JPanel(new GridLayout(1, 3, 20, 5));
@@ -154,7 +148,6 @@ public class PanelHistorial extends JPanel {
         return panel;
     }
 
-    // MÉTODO CORREGIDO 1: Envuelve JScrollPane en un JPanel
     private JPanel crearPanelAreaEquipos(Torneo t) {
         equiposTextArea = new JTextArea();
         equiposTextArea.setEditable(false);
@@ -170,14 +163,12 @@ public class PanelHistorial extends JPanel {
             BorderFactory.createLineBorder(Estilo.COLOR_TEXTO), 
             "Equipos Inscritos (" + t.getEquiposInscritos().size() + ")", TitledBorder.LEFT, TitledBorder.TOP, Estilo.FUENTE_SUBTITULO, Estilo.COLOR_TEXTO));
         
-        // FIX: Se crea un contenedor JPanel para devolver en lugar del JScrollPane
         JPanel container = new JPanel(new BorderLayout());
         Estilo.decorarPanel(container);
         container.add(scroll, BorderLayout.CENTER);
         return container; // Devuelve JPanel
     }
     
-    // MÉTODO CORREGIDO 2: Envuelve JScrollPane en un JPanel
     private JPanel crearPanelAreaPartidos(Torneo t, boolean finalizados) {
         JTextArea area = new JTextArea();
         area.setEditable(false);
@@ -210,7 +201,6 @@ public class PanelHistorial extends JPanel {
             BorderFactory.createLineBorder(finalizados ? Estilo.COLOR_OCUPADO : Estilo.COLOR_PRINCIPAL), // Color Rojo/Verde
             titulo, TitledBorder.LEFT, TitledBorder.TOP, Estilo.FUENTE_SUBTITULO, finalizados ? Estilo.COLOR_OCUPADO : Estilo.COLOR_PRINCIPAL));
         
-        // FIX: Se crea un contenedor JPanel para devolver en lugar del JScrollPane
         JPanel container = new JPanel(new BorderLayout());
         Estilo.decorarPanel(container);
         container.add(scroll, BorderLayout.CENTER);

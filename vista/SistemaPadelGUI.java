@@ -23,7 +23,6 @@ public class SistemaPadelGUI extends JFrame {
 
     public SistemaPadelGUI() {
         gestor = new GestorSistema();
-        // Since IPersistencia is an interface, we must instantiate the concrete class
         persistencia = new PersistenciaSerializable(); 
         
         gestor.setPersistencia(persistencia);
@@ -31,7 +30,6 @@ public class SistemaPadelGUI extends JFrame {
         // Cargar datos al inicio (si el archivo existe)
         persistencia.cargarDatos(gestor);
         
-        // REMOVIDA la lógica de inicialización automática de datos de prueba.
         // El sistema iniciará vacío si la carga falla.
 
         setTitle("Sistema de Gestión de Torneos para Pádel");
@@ -42,7 +40,7 @@ public class SistemaPadelGUI extends JFrame {
         CardLayout cardLayout = new CardLayout();
         JPanel mainPanel = new JPanel(cardLayout);
 
-        // --- INSTANCIACIÓN DE LOS PANELES ---
+        // INSTANCIACIÓN DE LOS PANELES
         panelJugadores = new PanelGestionJugadores(gestor, cardLayout, mainPanel);
         panelEquipos = new PanelGestionEquipos(gestor, cardLayout, mainPanel);
         panelSedes = new PanelGestionSedes(gestor, cardLayout, mainPanel);
@@ -52,7 +50,6 @@ public class SistemaPadelGUI extends JFrame {
         panelHistorial = new PanelHistorial(gestor, cardLayout, mainPanel);
         panelDisponibilidad = new PanelDisponibilidadCanchas(gestor, cardLayout, mainPanel); 
 
-        // --- REGISTRO DE ACCIONES DE ACTUALIZACIÓN ---
         panelMenu = new PanelMenuPrincipal(cardLayout, mainPanel,
             panelJugadores::actualizar,
             panelEquipos::actualizar,
@@ -64,7 +61,7 @@ public class SistemaPadelGUI extends JFrame {
             panelDisponibilidad::actualizar
         );
 
-        // --- AÑADIR PANELES AL CARDLAYOUT ---
+        //  AÑADIR PANELES AL CARDLAYOUT
         mainPanel.add(panelMenu, "MENU");
         mainPanel.add(panelJugadores, "JUGADORES");
         mainPanel.add(panelEquipos, "EQUIPOS");
@@ -79,5 +76,4 @@ public class SistemaPadelGUI extends JFrame {
         setVisible(true);
     }
     
-    // El método inicializarDatosDePrueba() ha sido ELIMINADO.
 }

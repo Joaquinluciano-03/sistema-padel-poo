@@ -32,7 +32,7 @@ public class CompeticionServicio implements ICompeticionServicio {
         sedes.add(sede);
     }
     
-    // --- NUEVOS MÉTODOS DE ELIMINACIÓN ---
+    // MÉTODOS DE ELIMINACIÓN
     
     @Override
     public boolean eliminarSede(String nombre) {
@@ -44,7 +44,7 @@ public class CompeticionServicio implements ICompeticionServicio {
         if (sede == null) return false;
         return sede.getCanchas().removeIf(c -> c.getNumero() == numeroCancha);
     }
-    // -------------------------------------
+   
 
     @Override
     public void registrarTorneo(Torneo torneo) {

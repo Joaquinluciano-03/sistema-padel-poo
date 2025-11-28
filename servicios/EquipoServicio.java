@@ -8,9 +8,9 @@ import modelo.Jugador;
 
 /**
  * Clase de servicio responsable de la gestión de la colección de equipos.
- * Implementa IEquipoServicio para cumplir el DIP.
+ * Implementa IEquipoServicio
  */
-public class EquipoServicio implements IEquipoServicio { // <-- Implementa la interfaz
+public class EquipoServicio implements IEquipoServicio { //Implementa la interfaz
     private List<Equipo> equiposRegistrados = new ArrayList<>();
 
     @Override
@@ -30,20 +30,19 @@ public class EquipoServicio implements IEquipoServicio { // <-- Implementa la in
         equiposRegistrados.add(equipo);
     }
     
-    /**
-     * NUEVO MÉTODO CENTRALIZADO: Edita el nombre y la composición de jugadores de un equipo.
+    /** Edita el nombre y la composición de jugadores de un equipo.
      */
     @Override
     public void editar(String nombreActual, String nuevoNombre, List<Jugador> nuevosJugadores) throws EquipoYaExisteException, IllegalArgumentException {
         Equipo equipo = buscarPorNombre(nombreActual);
         if (equipo == null) return; 
 
-        // 1. Validar la nueva lista de jugadores
+        // Validar la nueva lista de jugadores
         if (nuevosJugadores == null || nuevosJugadores.size() != 2) {
             throw new IllegalArgumentException("Un equipo debe tener exactamente 2 jugadores.");
         }
 
-        // 2. Validar el nuevo nombre (si cambió)
+        // Validar el nuevo nombre (si cambió)
         if (!nombreActual.equalsIgnoreCase(nuevoNombre)) {
             Equipo otro = buscarPorNombre(nuevoNombre);
             if (otro != null) {
@@ -51,7 +50,7 @@ public class EquipoServicio implements IEquipoServicio { // <-- Implementa la in
             }
         }
         
-        // 3. Aplicar cambios
+        // Aplicar cambios
         equipo.setNombre(nuevoNombre);
         equipo.setJugadores(nuevosJugadores);
     }

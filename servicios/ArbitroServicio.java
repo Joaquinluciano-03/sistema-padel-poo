@@ -7,21 +7,17 @@ import modelo.Arbitro;
 
 /**
  * Clase de servicio responsable únicamente de la gestión de la colección de Árbitros.
- * Implementa IArbitroServicio para cumplir el DIP y SRP/ISP.
+ * Implementa IArbitroServicio
  */
 public class ArbitroServicio implements IArbitroServicio {
     
     private List<Arbitro> arbitrosRegistrados = new ArrayList<>();
 
     /**
-     * Registra un nuevo árbitro. 
-     * Nota: Esta función debe verificar si el DNI ya existe en otras colecciones (como Jugador)
-     * en la capa de Fachada para mantener la unicidad global.
+     * Registra un nuevo árbitro
      */
     @Override
     public void registrar(Arbitro arbitro) throws JugadorYaExisteException {
-        // En este servicio, verificamos solo contra la lista de árbitros, 
-        // asumiendo que la verificación cruzada con Jugadores ocurre en la Fachada.
         boolean yaExiste = arbitrosRegistrados.stream()
                 .anyMatch(a -> a.getDni().equalsIgnoreCase(arbitro.getDni()));
 

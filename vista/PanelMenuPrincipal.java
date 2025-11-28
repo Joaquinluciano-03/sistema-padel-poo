@@ -10,7 +10,7 @@ public class PanelMenuPrincipal extends JPanel {
         // Usamos Estilo.decorarPanel para aplicar el fondo
         Estilo.decorarPanel(this);
         
-        this.setLayout(new GridLayout(10, 1, 15, 15)); // Aumentado de 9 a 10
+        this.setLayout(new GridLayout(10, 1, 15, 15)); 
         this.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         // El título se crea y se decora con el método estático
@@ -23,7 +23,6 @@ public class PanelMenuPrincipal extends JPanel {
         this.add(crearBotonNavegacion("Gestionar Sedes y Canchas", "SEDES", cardLayout, mainPanel, updateActions[2]));
         this.add(crearBotonNavegacion("Gestionar Competiciones", "TORNEOS_PARTIDOS", cardLayout, mainPanel, updateActions[3]));
         
-        // --- NUEVO BOTÓN ---
         this.add(crearBotonNavegacion("Gestionar Árbitros", "ARBITROS", cardLayout, mainPanel, updateActions[4]));
         
         this.add(crearBotonNavegacion("Ver Rankings", "RANKINGS", cardLayout, mainPanel, updateActions[5]));

@@ -30,9 +30,7 @@ public class GeneradorDatos {
         gestor.setPersistencia(persistencia);
 
         try {
-            // ---------------------------------------------------------
-            // 2. CREAR SEDES Y CANCHAS
-            // ---------------------------------------------------------
+            //CREAR SEDES Y CANCHAS
             System.out.println("-> Generando Sedes y Canchas...");
             
             Sede sedeCentro = new Sede("Padel Club Centro", "Av. Libertador 1000");
@@ -49,9 +47,7 @@ public class GeneradorDatos {
             sedeNorte.agregarCancha(c4);
             gestor.agregarSede(sedeNorte);
 
-            // ---------------------------------------------------------
-            // 3. CREAR ÁRBITROS
-            // ---------------------------------------------------------
+            // CREAR ÁRBITROS
             System.out.println("-> Generando Árbitros...");
             
             Arbitro a1 = new Arbitro("Horacio", "Elizondo", "1001", "LIC-PRO-01");
@@ -62,9 +58,7 @@ public class GeneradorDatos {
             gestor.registrarArbitro(a2);
             gestor.registrarArbitro(a3);
 
-            // ---------------------------------------------------------
-            // 4. CREAR JUGADORES (8)
-            // ---------------------------------------------------------
+            //  CREAR JUGADORES (8)
             System.out.println("-> Generando Jugadores...");
             
             Jugador j1 = new Jugador("Alejandro", "Galan", "2001", "Revés", 9);
@@ -83,9 +77,7 @@ public class GeneradorDatos {
                 gestor.registrarJugador(j);
             }
 
-            // ---------------------------------------------------------
-            // 5. CREAR EQUIPOS (4)
-            // ---------------------------------------------------------
+            // CREAR EQUIPOS (4)
             System.out.println("-> Generando Equipos...");
             
             Equipo eq1 = new Equipo("Los Galacticos", Arrays.asList(j1, j2));
@@ -98,9 +90,7 @@ public class GeneradorDatos {
             gestor.registrarEquipo(eq3);
             gestor.registrarEquipo(eq4);
 
-            // ---------------------------------------------------------
-            // 6. ESCENARIO A: TORNEO FINALIZADO ("Copa Apertura")
-            // ---------------------------------------------------------
+            // TORNEO FINALIZADO ("Copa Apertura")
             System.out.println("-> Creando Torneo Finalizado...");
             
             Torneo torneoFin = new Torneo("Copa Apertura 2024", 4);
@@ -136,9 +126,7 @@ public class GeneradorDatos {
             gestor.finalizarTorneo(torneoFin, eq1);
 
 
-            // ---------------------------------------------------------
-            // 7. ESCENARIO B: TORNEO EN CURSO ("Liga de Invierno")
-            // ---------------------------------------------------------
+            //  TORNEO EN CURSO ("Liga de Invierno")
             System.out.println("-> Creando Torneo En Curso...");
             
             Torneo torneoCurso = new Torneo("Liga de Invierno 2025", 4);
@@ -166,18 +154,16 @@ public class GeneradorDatos {
                 gestor.registrarPartidoSuelto(pCurso2);
             }
 
-            // ---------------------------------------------------------
-            // 8. PARTIDOS SUELTOS (Amistosos)
-            // ---------------------------------------------------------
+            // ARTIDOS SUELTOS (Amistosos)
             System.out.println("-> Creando Partidos Sueltos...");
 
-            // Amistoso Finalizado (Hace 2 días)
+            // Amistoso Finalizado 
             LocalDateTime fechaAmistoso1 = LocalDateTime.now().minusDays(2).withHour(20).withMinute(0);
             Partido amistoso1 = new Partido(eq1, eq3, fechaAmistoso1, 60, c2, a3, null);
             gestor.registrarPartidoSuelto(amistoso1);
             gestor.finalizarPartido(amistoso1, "6-3, 6-3", eq1);
 
-            // Amistoso Pendiente (Hoy más tarde)
+            // Amistoso Pendiente 
             LocalDateTime fechaAmistoso2 = LocalDateTime.now().plusHours(2).withMinute(0); // Dentro de 2 horas
             // Aseguramos que sea en horario válido (8-22)
             if (fechaAmistoso2.getHour() < 8) fechaAmistoso2 = fechaAmistoso2.withHour(8);

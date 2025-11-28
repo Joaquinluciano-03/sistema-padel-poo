@@ -39,7 +39,7 @@ public class PersistenciaSerializable implements IPersistencia {
             oos.writeObject(gestor.getEquiposRegistrados());
             oos.writeObject(gestor.getTodosLosTorneos());
 
-            // --- NUEVO: Escribir la lista de Partidos Sueltos ---
+            // Escribir la lista de Partidos Sueltos
             oos.writeObject(gestor.getPartidosSuetos()); 
 
             System.out.println("-> DATOS GUARDADOS AUTOMÁTICAMENTE en " + FILE_PATH);
@@ -63,7 +63,7 @@ public class PersistenciaSerializable implements IPersistencia {
             List<Equipo> equipos = (List<Equipo>) ois.readObject();
             List<Torneo> torneos = (List<Torneo>) ois.readObject();
             
-            // --- NUEVO: Leer la lista de Partidos Sueltos ---
+            //Leer la lista de Partidos Sueltos
             List<Partido> partidosSuetos = (List<Partido>) ois.readObject();
 
 
@@ -75,7 +75,7 @@ public class PersistenciaSerializable implements IPersistencia {
             gestor.getTodosLosTorneos().clear(); 
 
 
-            // 2. Cargar datos en el GestorSistema (Fachada)
+            // Cargar datos en el GestorSistema
 
             sedes.forEach(gestor::agregarSede); 
 
@@ -109,7 +109,7 @@ public class PersistenciaSerializable implements IPersistencia {
             // Cargar Torneos globalmente
             torneos.forEach(gestor::registrarTorneo);
             
-            // --- NUEVO: Cargar Partidos Sueltos ---
+            // Cargar Partidos Sueltos
             // Asumimos que los partidos sueltos deben cargarse directamente en el servicio.
             // Puesto que CompeticionServicio ya tiene el método setPartidosSuetos(List<Partido> partidos), lo delegamos.
             gestor.setPartidosSuetos(partidosSuetos);
